@@ -1,0 +1,66 @@
+version: "3.5"
+
+networks:
+  inception:
+    driver: bridge
+
+volumes:
+  wordpress:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /mnt/nfs/homes/switt/data/wordpress
+
+
+  mariadb:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /mnt/nfs/homes/switt/data/wordpress
+
+
+services:
+  mariadb:
+    container_name: mariadb
+    build: ./mariadb
+    env_file:
+      - .env
+    volumes:
+      - /mnt/nfs/homes/switt/data/mariadb:/var/lib/mysql
+    networks:
+      - inception
+    restart: unless-stopped
+    expose:                         
+      - "3306"
+  
+  wordpress:
+    container_name: wordpress
+    build: ./wordpress
+    env_file:
+      - .env
+    depends_on:
+      - mariadb
+    volumes:
+      - /mnt/nfs/homes/switt/data/wordpress:/var/www/wordpress
+    networks:
+      - inception
+    restart: unless-stopped
+    expose: 
+      - "9000"
+
+  nginx:
+    container_name: nginx
+    build: ./nginx
+    env_file:
+      - .env
+    ports:
+      - "443:443"
+    depends_on:
+      - wordpress
+    volumes:
+      - wordpress:/var/www/wordpress
+    networks:
+      - inception
+    restart: unless-stopped
