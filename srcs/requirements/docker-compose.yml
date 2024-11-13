@@ -10,7 +10,7 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /mnt/nfs/homes/switt/data/wordpress
+      device: /home/switt/data/wordpress
 
 
   mariadb:
@@ -18,7 +18,7 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /mnt/nfs/homes/switt/data/wordpress
+      device: /home/switt/data/mariadb
 
 
 services:
@@ -28,7 +28,7 @@ services:
     env_file:
       - .env
     volumes:
-      - /mnt/nfs/homes/switt/data/mariadb:/var/lib/mysql
+      - mariadb:/var/lib/mysql
     networks:
       - inception
     restart: unless-stopped
@@ -43,7 +43,7 @@ services:
     depends_on:
       - mariadb
     volumes:
-      - /mnt/nfs/homes/switt/data/wordpress:/var/www/wordpress
+      - wordpress:/var/www/wordpress
     networks:
       - inception
     restart: unless-stopped
